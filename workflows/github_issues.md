@@ -14,27 +14,35 @@ Provide a repeatable, out-of-the-box workflow for turning GitHub Issues into shi
 - `gh` installed and authenticated (`gh auth status`)
 
 ### Workspace setup (recommended)
-Clone the target repository as a **git submodule** under `projects/` so agents can work on code locally:
+Clone target repositories into `workspace/` as normal git clones (not submodules). This workflow discovers repos from the local `workspace/` directory, so it does not depend on any specific repository being hardcoded.
 
 ```bash
 # from the oh-my-code repo root
-mkdir -p projects
+mkdir -p workspace
 
-# pick a local folder name (example: repo)
-git submodule add "https://github.com/OWNER/REPO.git" "projects/repo"
-git submodule update --init --recursive
+# clone a repo into a local folder name (example: repo)
+git clone "https://github.com/OWNER/REPO.git" "workspace/repo"
 ```
 
-Then run work from the submodule directory when implementing:
+List discovered repos (directory name + detected GitHub slug from `origin`):
+```bash
+bash scripts/workspace-repos.sh
+```
+
+Then run work from the repo directory when implementing:
 
 ```bash
-cd projects/repo
+cd workspace/repo
 ```
 
 ### Set your target repo once
 ```bash
-REPO="OWNER/REPO"
+TARGET_REPO="repo"                 # directory under workspace/
+TARGET_PATH="workspace/$TARGET_REPO"
+REPO="$(bash scripts/github-repo-from-origin.sh "$TARGET_PATH")"
 ```
+
+If the repo has no `origin` remote or it is not a GitHub URL, set `REPO` manually (e.g. `OWNER/REPO`).
 
 ## Label Conventions (Recommended)
 
@@ -181,4 +189,3 @@ If you want to cap pending human merges (e.g., max 3 across teams), check before
 ```bash
 gh search issues --repo "$REPO" --state open --label 'status:awaiting-human-merge'
 ```
-

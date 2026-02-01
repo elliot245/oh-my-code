@@ -10,3 +10,5 @@ __pycache__
 workspace/*
 !workspace/.gitkeep
 !workspace/README.md
+!workspace/openclaw-gateway-app/
+!workspace/openclaw-gateway-app/**
